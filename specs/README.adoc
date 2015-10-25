@@ -1,0 +1,176 @@
+= Specification
+
+The `.groovy` files in this directory make up the pipeline script specification.
+With different pipeline scripts for the different situations that are possible.
+
+== Key principles
+
+- describes delivery pipeline for Continuous Delivery +
+  with that also supports Continuous Deployment and Continuous Integration
+- must be CI/CD tool agnostic, +
+  but is not limited to existing features of existing tools
+- everything that can impact the outcome of the pipeline, must be versioned
+- expects the pipeline script to be versioned with the project code
+
+== Syntax
+
+Currently the specification has a syntax which is mostly compatible with the Groovy language,
+therefor has the `.groovy` extension for automatic highlighting in your favorite editor.
+
+== Things to support
+
+- pipeline script versions
+- include external pipeline parts
+  * reuse pipeline parts, eg. company wide deploy tasks
+- environment variables
+- handling of sensitive data:
+  * values (eg. environment variable values)
+  * files
+- matrix builds
+  * pipeline, stage or task level?
+- platform/OS dependencies
+  * on which platform/OS should the pipeline/stage/task run?
+  * tags/labels to bind to a set of executors?
+- messengers/notifications
+- run pipeline/tasks in parallel/serial (depending on their default)
+- fan-out/in
+- manual triggers
+  * with and without parameters
+
+== Reference concepts
+
+Existing tools have their own concepts. Lets take them as a reference.
+
+=== Oldskool CI
+
+Jenkins/Hudson, CruiseControl, Teamcity, all examples of oldskool CI tools.
+These tools have one thing in common, their concepts are Job based.
+Meaning all configuration is done per Job, and the job knows everything it has to do.
+
+When the tool supports "pipelines", they basically link jobs together.
+Often this support is added via plugins.
+
+.Oldskool CI concepts
+|===
+|Model |Type |Parallelism |Description
+
+|Job
+|config
+|-
+|configuration
+
+|Build
+|runtime
+|serial/parallel per job^*^  (serial-by-default)
+|execution of a Job run and its results
+|===
+^*^ serial/parallel is configurable
+
+=== go.cd
+
+[quote, go.cd as described on their site, http://www.go.cd]
+____
+Pipelines at the Core
+
+Model even the most complex build & deploy workflow with ease. Unlike CI servers,
+Go was built from the ground up with pipelines in mind. Go makes it simple to model
+failing fast, artifact promotion, self-service environments and single-click deployment.
+____
+
+go.cd is created by ThoughtWorks, the company behind the writers of the Continuous Delivery book.
+What concepts do they use to describe their pipelines?
+
+.go.cd concepts
+|===
+|Concept |Type |Parallelism |Description
+
+|Pipeline
+|config, runtime
+|serial/parallel per pipeline^*^ (parallel-by-default)
+|Pipeline configuration and Pipeline result
+
+|Stage
+|config, runtime
+|serial per Pipeline
+|Stage configuration and Stage result
+
+|Job
+|config, runtime
+|parallel per stage
+|Job configuration and Job result
+
+|Task
+|?^**^
+|serial per Job
+|?^**^
+
+|Material
+|config
+|-
+|Input for the Pipeline (eg. git commit)
+
+|Artifact
+|config
+|-
+|Output of a Job (eg. jar; can be fetched via a Task in a followup Job)
+|===
+^\*^ serial/parallel is configurable +
+^**^ was unable to find the code related to this
+
+.Concept relations
+Pipeline => has 1 or more Stages +
+Pipeline => has 1 or more Materials +
+Stage => has 1 or more Jobs +
+Job => has 1 or more Tasks +
+Job => has 1 or more Artifacts
+
+=== Concourse
+
+[quote, Concourse as described on their site, http://concourse.ci]
+____
+Concourse is a CI system composed of simple tools and ideas. It can express entire pipelines,
+integrating with arbitrary resources, or it can be used to execute one-off tasks, either
+locally or in another CI system.
+____
+
+.Concourse concepts
+|===
+|Concept |Type |Parallelism |Description
+
+|Pipeline
+|config, runtime
+|parallel per pipeline
+|Stage configuration and Stage result
+
+|Job
+|config, runtime
+|serial/parallel per Pipeline^*^  (parallel-by-default)
+|Job configuration
+
+|BuildPlan
+|config, runtime
+|-
+|Build Plan of a Job
+
+|Task
+|config
+|serial/parallel per BuildPlan^*^  (serial-by-default)
+|Task configuration
+
+|Resource
+|config
+|-
+|Abstraction of all Input and Output resources (eg. git, svn, artifactory)
+
+|Build
+|result
+|-
+|execution result of a Task
+|===
+^*^ serial/parallel is configurable
+
+.Concept relations
+Pipeline => has 1 or more Jobs +
+Job => has 1 BuildPlan +
+BuildPlan => has 1 or more Tasks +
+BuildPlan => has 1 or more Resources +

@@ -1,0 +1,41 @@
+= Pipeline script
+
+Pipeline script is a Domain Specific Language (DSL) for describing delivery pipelines (pipeline)
+as used in the practise of Continuous Delivery (CD), Continuous Deployment
+and in the basis also Continuous Integration (CI).
+
+The purpose of this project is to be the specification of the pipeline script DSL.
+And provide a reference implementation to parse the syntax into a model that
+can be used by other projects to configure existing CI/CD tools with.
+
+== Vision
+
+One DSL to describe delivery pipelines in a CI/CD tool agnostic way.
+
+Each CI/CD tool then has its own adapter/importer/way to read the DSL and
+transform it to the tool specific way of configuring pipelines.
+
+== Status
+
+Currently this project is in the _specification phase_.
+
+This means we're looking for a common language in the delivery pipelines domain.
+Looking at configurations used by existing tools like Jenkins, Jenkins Job DSL, Jenkins Workflow DSL,
+Travis-CI, Wercker, CircleCI, Concourse, Walter, etc. and the best practices in the CI/CD domain.
+
+== Specification
+
+In the `specs` directory you can find different pipeline scripts for the different situations, which
+together make up the pipeline script specification.
+
+See `specs/README.adoc` for more details on the specification.
+
+== Source
+
+This project is currently a Gradle based Groovy project with source code in the `src` directory.
+The purpose of this source is to build a reference implementation to parse the syntax into a model that
+can be used to configure existing CI/CD tools..
+
+== Contribute
+
+Submit a pull-request or create an issue.
