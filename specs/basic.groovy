@@ -1,25 +1,79 @@
+/**
+ * The basic pipeline
+ *
+ * This pipeline must represent a basic pipeline for a single application/(micro)service.
+ * - A pipeline run is always executed from end-to-end until a failure stops the line.
+ * - A pipeline is triggered by default by a commit/push, but this is handled by the CD tool
+ *   and/or pipeline-script adapter/importer that is triggered by a hook from the SCM system (eg. git).
+ * - The pipeline doesn't know anything about the SCM system, as it expects that each job is always
+ *   run in a workspace containing the data it should work on. Additional resources can be fetched
+ *   with normal exec commands as you would normally.
+ *
+ * Two important characteristics:
+ * - there are 4 built-in, powerful abstractions and their relationship:
+ *   Tasks/Execs inside Jobs inside Stages inside Pipelines
+ * - the fact that some are executed in parallel (depending on salve/agents availability) while others sequentially:
+ *   - Multiple Pipelines run in parallel
+ *   - Multiple Stages within a Pipeline run sequentially
+ *   - Multiple Jobs within a Stage run in parallel
+ *   - Multiple Tasks/Execs within a Job run sequentially
+ */
+
 script(
+    // pipeline-script version
     version: 0.1
 )
 
 require(
-    name: 'myName', version: 1.0.0        // tool is the default, therefor this is the same as "tool name: 'myName', version: 'myVersion'"
-    tool name: 'myName', version: 0.1.5
-    plugin name: 'myName', version: 0.23  // only for CI tools that require plugins, would like to not have this in here
+    name: 'git', version: 2.6.2           // tool is the default, therefor this is the same as "tool name: 'myName', version: 'myVersion'"
+    tool name: 'cat', version: 8.21
+    name: 'openjdk', version: 1.8.0_66
+//  plugin name: 'myName', version: 0.23  // only for CI tools that require plugins, would like to not have this in here
 )
 
 stage('commit') {
+    job {
+        exec './gradlew clean build'
 
+        // Archive artifacts for use in other stages
+        artifact 'build/lib/*.jar'
+        // or to be able to use the artifacts (eg. test reports/data) outside the pipeline, eg. in UI
+        artifact 'build/reports', 'build/test-results/**/*.xml'
+    }
 }
 
 stage(id: 'acceptance', title: 'ACC') {
+    // jobs run in parallel in a stage
+    job(id: 'acceptance-windows', tags: ['windows']) {
+        fetch 'build/lib/*.jar'
 
+        exec './gradlew integration-test-windows'
+    }
+
+    job(id: 'acceptance-linux', tags: ['linux']) {
+        fetch 'build/lib/*.jar'
+
+        exec './gradlew integration-test-linux'
+    }
+    // stage is success if all jobs are finished and successful
 }
 
 stage('release') {
+    job {
+        exec './gradlew release'
+        exec '''git tag --annotate --file - v$(source version.properties; ${version}) <<<\
+         v$(source version.properties; ${version})
 
+         Release version $(source version.properties; ${version}) containing
+         ${cat CHANGELOG.md}
+         '''
+        exec 'git push origin v$(source version.properties; ${version})'
+
+        artifact 'build/distribution/*'
+    }
 }
 
+// pipeline that is triggered by a change on a branch starting with the name 'feature/'
 pipeline(type: branch(/^feature\/*/)) {
     stages(
         'commit'
@@ -27,11 +81,12 @@ pipeline(type: branch(/^feature\/*/)) {
     )
 }
 
+// pipeline that is triggered by an incoming pullrequest or a change on a pullrequest
 pipeline(type: pullrequest) {
     stages('commit')
 }
 
-// == default pipeline
+// pipeline that is triggered in all other cases
 pipeline {
     stages(
         'commit'
