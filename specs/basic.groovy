@@ -28,7 +28,6 @@ require(
     name: 'git', version: 2.6.2           // tool is the default, therefor this is the same as "tool name: 'myName', version: 'myVersion'"
     tool name: 'cat', version: 8.21
     name: 'openjdk', version: 1.8.0_66
-//  plugin name: 'myName', version: 0.23  // only for CI tools that require plugins, would like to not have this in here
 )
 
 stage('commit') {
