@@ -36,6 +36,8 @@ therefor has the `.groovy` extension for automatic highlighting in your favorite
 - fan-out/in
 - manual triggers
   * with and without parameters
+- authorization
+- unit test the pipeline script (?)
 
 == Reference concepts
 
