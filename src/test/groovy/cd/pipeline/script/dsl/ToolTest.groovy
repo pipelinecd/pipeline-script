@@ -4,7 +4,7 @@ import groovy.transform.EqualsAndHashCode
 import groovy.transform.Immutable
 import spock.lang.Specification
 
-class ToolSpec extends Specification {
+class ToolTest extends Specification {
 
     def "Tool is @Immutable"() {
         expect:

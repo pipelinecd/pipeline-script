@@ -4,6 +4,7 @@ import cd.pipeline.script.dsl.Tool;
 import groovy.lang.GroovyShell;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
+import org.codehaus.groovy.control.customizers.SecureASTCustomizer;
 
 import java.io.PrintStream;
 
@@ -15,15 +16,18 @@ public class PipelineScriptRunner {
 
     public PipelineScriptRunner(final PrintStream output, final String scriptText) {
         redirectedOutput = output;
-        final CompilerConfiguration config = new CompilerConfiguration();
+        CompilerConfiguration config = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
         config.setScriptBaseClass(PipelineScript.class.getName());
 
         ImportCustomizer importCustomizer = new ImportCustomizer();
         importCustomizer.addStarImports(Tool.class.getPackage().getName());
-        config.addCompilationCustomizers(importCustomizer);
+
+        SecureASTCustomizer secureCustomizer = new SecureASTCustomizer();
+
+        config.addCompilationCustomizers(importCustomizer, secureCustomizer);
 
         final GroovyShell shell = new GroovyShell(config);
-        script = (PipelineScript) shell.parse(scriptText);
+        script = (PipelineScript) shell.parse(scriptText); // TODO: Add original filename? Needed?
 
         script.init(new PipelineDsl());
     }

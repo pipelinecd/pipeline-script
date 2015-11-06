@@ -3,7 +3,7 @@ package cd.pipeline.script.dsl
 import cd.pipeline.script.PipelineDsl
 import spock.lang.Specification
 
-class PipelineDslSpec extends Specification {
+class RequirementsTest extends Specification {
     private PipelineDsl script
 
     void setup() {

@@ -1,10 +1,13 @@
 package cd.pipeline.script
 
+import cd.pipeline.script.dsl.StageSpec
 import cd.pipeline.script.dsl.Tool
+import cd.pipeline.script.util.ConfigureUtil
 import com.google.common.collect.ImmutableSet
 
 class PipelineDsl {
     private Set<Tool> require = ImmutableSet.of()
+    private Set<StageSpec> stages = ImmutableSet.of()
 
     void require(Tool... tools) {
         if (require) {
@@ -20,5 +23,19 @@ class PipelineDsl {
 
     Set<Tool> getRequire() {
         ImmutableSet.copyOf(require)
+    }
+
+    void stage(String id, @DelegatesTo(value = StageSpec, strategy = Closure.DELEGATE_FIRST) Closure cl) {
+        def stage = new StageSpec(id)
+        def clone = cl.rehydrate(stage, this, this)
+        ConfigureUtil.configure(stage, clone)
+        stages = ImmutableSet.builder()
+            .addAll(stages)
+            .add(stage)
+            .build()
+    }
+
+    Set<StageSpec> getStages() {
+        return stages
     }
 }
