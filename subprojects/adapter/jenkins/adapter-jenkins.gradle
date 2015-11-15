@@ -2,6 +2,7 @@ apply plugin: 'groovy'
 
 dependencies {
     compile project(':api')
+    compile project(':dsl')
     compile libraries.groovy
     compile libraries.guava
 

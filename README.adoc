@@ -1,4 +1,5 @@
 = Pipeline script
+:toc:
 
 Pipeline script is a Domain Specific Language (DSL) for describing delivery pipelines (pipeline)
 as used in the practise of Continuous Delivery (CD), Continuous Deployment
@@ -32,9 +33,73 @@ See `specs/README.adoc` for more details on the specification.
 
 == Source
 
-This project is currently a Gradle based Groovy project with source code in the `src` directory.
 The purpose of this source is to build a reference implementation to parse the syntax into a model that
 can be used to configure existing CI/CD tools..
+
+These are spread over the subprojects in the `subprojects` directory.
+The following sections describe the purpose of the different subprojects.
+
+=== API
+
+Pipeline Script API
+
+=== DSL
+
+Reference implementation of the Pipeline Script DSL.
+
+=== Adapter
+
+The different adapter implementations.
+Each adapter converts a Pipeline Script into adapter tool specific configuration.
+
+eg.:
+* Jenkins adapter
+* go.cd adapter
+* concourse.ci adapter
+* walter-cd adapter
+* teamcity adapter
+
+==== API
+
+The adapter API used by the different adapter implementations.
+
+=== SCM
+
+The different SCM listener implementations.
+Each SCM implementation understands the SCM manager specific
+webhook format, and return the pipeline script info.
+
+eg.:
+* Github SCM
+* Gitlab SCM
+* Stash/Bitbucket server SCM
+* Bitbucket cloud SCM
+
+==== API
+
+The SCM API used by the different SCM implementations.
+
+=== Listener
+
+The different listener applications that support the different
+combinations of SCM and adapter implementations.
+
+eg.:
+* Github SCM, Jenkins adapter
+* Gitlab SCM, Jenkins adapter
+* Stash/Bitbucket server SCM, Jenkins adapter
+* Bitbucket cloud SCM, Jenkins adapter
+
+==== Core
+
+The core listener application library that can be used to simply compose
+different SCM API and adapter API implementations into a listener service.
+
+== TODO
+
+* Create webhook listeners
+** one for each SCM manager {github|gitlab|stash/bitbucket server|...}
+   and adapter implementation {jenkins|..} combination
 
 == Contribute
 

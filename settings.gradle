@@ -1,11 +1,22 @@
 
 include 'api'
 include 'dsl'
+include 'adapterApi'
+include 'adapterJenkins'
+include 'scmApi'
+include 'scmGithub'
+include 'scmGitlab'
+include 'scmStash'
+include 'listenerCore'
+include 'listenerGithubJenkins'
+include 'listenerGitlabJenkins'
+include 'listenerStashJenkins'
 
 rootProject.name = 'pipeline-script'
-rootProject.children.each {project ->
+rootProject.children.each { project ->
     String fileBaseName = project.name.replaceAll("\\p{Upper}") { "-${it.toLowerCase()}" }
-    String projectDirName = "subprojects/$fileBaseName"
+    String dirBaseName = fileBaseName.replaceFirst("-") { "/" }
+    String projectDirName = "subprojects/$dirBaseName"
     project.projectDir = new File(settingsDir, projectDirName)
     project.buildFileName = "${fileBaseName}.gradle"
     assert project.projectDir.isDirectory()

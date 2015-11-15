@@ -1,7 +1,10 @@
 apply plugin: 'java'
 
 dependencies {
+    compile project(':api')
+    compile project(':dsl')
     compile libraries.groovy
+    compile libraries.guava
 
     testCompile libraries.spock
 }
