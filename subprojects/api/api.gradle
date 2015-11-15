@@ -1,0 +1,6 @@
+apply plugin: 'java'
+
+dependencies {
+    compile libraries.groovy
+    testCompile libraries.spock
+}

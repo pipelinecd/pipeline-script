@@ -1,0 +1,45 @@
+ext {
+    libraries = [:]
+    versions = [:]
+}
+
+versions += [
+    groovy: '2.4.5',
+    guava : '18.0',
+    junit : '4.12',
+    asm   : '4.1',
+]
+
+libraries += [
+    groovy: "org.codehaus.groovy:groovy:${versions.groovy}",
+    guava : "com.google.guava:guava:${versions.guava}",
+    junit : "junit:junit:${versions.junit}",
+    asm   : "org.ow2.asm:asm:${versions.asm}",
+]
+
+libraries.spock = ['org.spockframework:spock-core:1.0-groovy-2.4',
+                   libraries.groovy,
+                   'org.objenesis:objenesis:2.0',
+                   'cglib:cglib-nodep:2.2'
+]
+
+allprojects {
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            def req = details.requested
+            // Replace groovy-all with groovy
+            if (req.name == 'groovy-all' || req.name == 'groovy') {
+                details.useTarget libraries.groovy
+            }
+            // Replace junit-dep with junit
+            if (req.name == 'junit-dep') {
+                details.useTarget libraries.junit
+            }
+            // Change old groupId of asm to new groupId, for correct dependency handling
+            if (req.group == 'asm') {
+                details.useTarget group: 'org.ow2.asm', name: req.name, version: req.version
+            }
+        }
+    }
+}
+
