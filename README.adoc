@@ -18,11 +18,13 @@ transform it to the tool specific way of configuring pipelines.
 
 == Status
 
-Currently this project is in the _specification phase_.
+[.line-through]#Currently this project is in the _specification phase_.#
 
-This means we're looking for a common language in the delivery pipelines domain.
-Looking at configurations used by existing tools like Jenkins, Jenkins Job DSL, Jenkins Workflow DSL,
-Travis-CI, Wercker, CircleCI, Concourse, Walter, etc. and the best practices in the CI/CD domain.
+[.line-through]#This means we're looking for a common language in the delivery pipelines domain.#
+[.line-through]#Looking at configurations used by existing tools like Jenkins, Jenkins Job DSL, Jenkins Workflow DSL,#
+[.line-through]#Travis-CI, Wercker, CircleCI, Concourse, Walter, etc. and the best practices in the CI/CD domain.#
+
+**THIS PROJECT IS ABANDONED**
 
 == Specification
 
